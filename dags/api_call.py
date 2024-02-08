@@ -1,22 +1,32 @@
 import json
 import requests
 
+import datetime
+from datetime import timedelta
+import pendulum
+
 from azure.storage.blob import BlobServiceClient, ContainerClient, BlobClient
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.resource import ResourceManagementClient
 
 import airflow
-from airflow import DAG
+from airflow import DAG, BaseOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.operators.python import PythonOperator
-
-import datetime
-import pendulum
+try:
+    from airflow.operators.empty import EmptyOperator
+except ModuleNotFoundError:
+    from airflow.operators.dummy import DummyOperator as EmptyOperator  
+from airflow.providers.microsoft.azure.operators.data_factory import AzureDataFactoryRunPipelineOperator
+from airflow.providers.microsoft.azure.sensors.data_factory import AzureDataFactoryPipelineRunStatusSensor
+from airflow.utils.edgemodifier import Label
 
 
 # Credentials for Azure
 
 azure_connection_id = 'azure-data-factory'
+azure_connection_string = 'DefaultEndpointsProtocol=https;AccountName=airplaneetl;AccountKey=K0pHJK8paR2yKLvxJKbz9nk7Fe4qsfsgMc/jZLYLtsXr+OTtyPVs8QcGYufvts3tJO2JYjRWKqWi+ASt71ofQw==;EndpointSuffix=core.windows.net'
+container_name = 'airplanec'
 factory_name = 'airplane-df'
 resource_group_name = 'ads507-team6'
 
@@ -63,7 +73,7 @@ def icao_api_call(api_key, state_of_operator, file_name, container_name, azure_c
 
 
 # DAGs  
-start_date = pendulum.today('UTC').add(days=-2)
+start_date = datetime(2024, 2, 7)
 
 default_args = {
     'owner': 'airflow',
@@ -76,12 +86,11 @@ default_args = {
 
 with DAG(
     dag_id="api_call_pipeline",
-    start_date=datetime(2024, 2, 7),
+    start_date=start_date,
     schedule_interval="@weekly",
     catchup=False,
     default_args={
         "retries": 1,
-        "retry_delay": datetime.timedelta(minutes=3),
         "azure_data_factory_conn_id": azure_connection_id,
         "factory_name": factory_name,
         "resource_group_name": resource_group_name,  
@@ -89,7 +98,7 @@ with DAG(
     default_view="graph",
 ) as dag:
 
-    icao_api_call = PythonOperator(
+    icao_task = PythonOperator(
         task_id = 'icao_api_call',
         python_callable = icao_api_call,
         op_kwargs = {
@@ -104,4 +113,5 @@ with DAG(
     ready = EmptyOperator(task_id='ready')
     
     # Set task dependencies
-    icao_api_call >> ready
+    
+    icao_task >> ready
