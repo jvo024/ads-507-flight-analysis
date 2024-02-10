@@ -3,22 +3,15 @@ import requests
 
 import datetime
 from datetime import timedelta
-import pendulum
 
 from azure.storage.blob import BlobServiceClient, ContainerClient, BlobClient
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.resource import ResourceManagementClient
 
 import airflow
-from airflow import DAG, BaseOperator
-from airflow.operators.empty import EmptyOperator
+from airflow.models import DAG, BaseOperator
 from airflow.operators.python import PythonOperator
-try:
-    from airflow.operators.empty import EmptyOperator
-except ModuleNotFoundError:
-    from airflow.operators.dummy import DummyOperator as EmptyOperator  
-from airflow.providers.microsoft.azure.operators.data_factory import AzureDataFactoryRunPipelineOperator
-from airflow.providers.microsoft.azure.sensors.data_factory import AzureDataFactoryPipelineRunStatusSensor
+
 from airflow.utils.edgemodifier import Label
 
 
@@ -73,45 +66,56 @@ def icao_api_call(api_key, state_of_operator, file_name, container_name, azure_c
 
 
 # DAGs  
-start_date = datetime(2024, 2, 7)
+# start_date = datetime(2024, 2, 7)
 
-default_args = {
-    'owner': 'airflow',
-    'depends_on_past': False,
-    'email_on_failure': False,
-    'email_on_retry': False,
-    'retries': 1,
-    'retry_delay': datetime.timedelta(minutes=5),
-}
+# default_args = {
+#     'owner': 'airflow',
+#     'depends_on_past': False,
+#     'email_on_failure': False,
+#     'email_on_retry': False,
+#     'retries': 1,
+#     'retry_delay': timedelta(minutes=5),  
+# }
 
-with DAG(
-    dag_id="api_call_pipeline",
-    start_date=start_date,
-    schedule_interval="@weekly",
-    catchup=False,
-    default_args={
-        "retries": 1,
-        "azure_data_factory_conn_id": azure_connection_id,
-        "factory_name": factory_name,
-        "resource_group_name": resource_group_name,  
-    },
-    default_view="graph",
-) as dag:
+icao_api_call(icao_api_key, icao_state_of_operator, icao_file_name, container_name, azure_connection_string)
 
-    icao_task = PythonOperator(
-        task_id = 'icao_api_call',
-        python_callable = icao_api_call,
-        op_kwargs = {
-            'api_key': icao_api_key,
-            'state_of_operator': icao_state_of_operator,
-            'file_name': icao_file_name,
-            'container_name': container_name,
-            'azure_connection_string': azure_connection_string},
-        dag = dag
-        )
+# with DAG(
+#     dag_id="api_call_pipeline",
+#     start_date=start_date,
+#     schedule_interval="@weekly",
+#     catchup=False,
+#     default_args=default_args,  
+#     default_view="graph",
+# ) as dag:
+
+#     begin = EmptyOperator(task_id="begin")
+#     end = EmptyOperator(task_id="end")
+
+#     icao_task = PythonOperator(
+#         task_id='icao_api_call',
+#         python_callable=icao_api_call,
+#         op_kwargs={
+#             'api_key': icao_api_key,
+#             'state_of_operator': icao_state_of_operator,
+#             'file_name': icao_file_name,
+#             'container_name': container_name,
+#             'azure_connection_string': azure_connection_string
+#         },
+#         dag=dag  
+#     )
     
-    ready = EmptyOperator(task_id='ready')
+#     run_pipeline_operator: BaseOperator = AzureDataFactoryRunPipelineOperator(
+#         task_id="run_adf_pipeline",
+#         pipeline_name="pipeline",
+#         azure_data_factory_conn_id=azure_connection_id,
+#         resource_group_name=resource_group_name,
+#         factory_name=factory_name,
+#         params={"param1": "{{ task_instance.xcom_pull(task_ids='icao_api_call', key='file_name') }}"}  
+#     )
+
+#     pipeline_run_sensor: BaseOperator = AzureDataFactoryPipelineRunStatusSensor(
+#         task_id="pipeline_run_sensor",
+#         run_id=run_pipeline_operator.output["run_id"]
+#     )
     
-    # Set task dependencies
-    
-    icao_task >> ready
+#     begin  >> icao_task >> run_pipeline_operator >> pipeline_run_sensor >> end
