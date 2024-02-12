@@ -40,7 +40,7 @@ def accidents_call(api_key, file_name):
 
     print('Start API call')
     
-    url = f"https://applications.icao.int/dataservices/api/accidents?api_key={api_key}&StateOfOccurrence=&format=json&StateOfOperator=usa&StateOfRegistry=&Year="
+    url = f"https://applications.icao.int/dataservices/api/accidents?api_key={api_key}&StateOfOccurrence=&format=json&StateOfOperator=USA&StateOfRegistry=&Year="
 
     # Make the API call
     response = requests.get(url)
