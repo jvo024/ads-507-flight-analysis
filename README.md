@@ -13,12 +13,10 @@ This project is intended to develop a production-ready data pipeline using fligh
 ## Requirements
 
 To replicate this project, the following technology will be needed:
-- [Python](https://www.python.org/) Version 3.9.18
+- [Python](https://www.python.org/) Version 3.11.5
 - [Apache Airflow](https://airflow.apache.org/) Version 2.6.3
 - [MySQL](https://www.mysql.com/) Version 8.0.35
 
 ## Project Datasets
 - ICAO API Data Service
-- Tomorrow.io Weather API
-- Open Sky REST API
 - airports.csv found via [Kaggle](https://www.kaggle.com/datasets/tylerx/flights-and-airports-data?select=airports.csv)
