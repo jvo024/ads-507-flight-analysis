@@ -1,0 +1,9 @@
+{
+	"name": "airplane-df",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "6274d600-020d-4d71-aa5d-81ecf7dc6b7b",
+		"tenantId": "fe4e1583-fb6f-48dd-8524-d06ad7501045"
+	}
+}
