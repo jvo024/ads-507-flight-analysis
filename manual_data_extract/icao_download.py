@@ -94,7 +94,7 @@ def incidents_call(api_key, file_name):
     else:
         print(f"Error: Unable to fetch data. Status code: {response.status_code}")
 
-# Variables        
+        
 icao_api_key = os.getenv("icao_api_key")
 
 operator_risk_file_name = 'airline_operator_risk.json'
