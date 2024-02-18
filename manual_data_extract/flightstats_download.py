@@ -27,15 +27,17 @@ def delay_index_call(app_id, app_key, file_name):
 
         file_path = os.path.join(directory, file_name)
 
+        # Load existing JSON data if the file exists
         existing_json_data = {}
         if os.path.exists(file_path):
             with open(file_path, 'r', encoding='utf-8') as json_file:
                 existing_json_data = json.load(json_file)
-        
+
+        # Merge new data with existing data
         existing_json_data.update(new_json_data)
 
-        # Save the JSON data to the file path
-        with open(file_path, 'w', encoding='utf-8') as json_file:
+        # Save the updated JSON data to the file path
+        with open(file_path, 'a', encoding='utf-8') as json_file:
             json.dump(existing_json_data, json_file, ensure_ascii=False, indent=4)
 
         print('End API call')
