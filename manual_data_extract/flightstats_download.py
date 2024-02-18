@@ -18,7 +18,7 @@ def delay_index_call(app_id, app_key, file_name):
 
     # Check if the request was successful
     if response.status_code == 200:
-        json_data = response.json()
+        new_json_data = response.json()
 
         # Define the directory path
         directory = os.path.join(os.getcwd(), 'raw_data')
@@ -27,9 +27,16 @@ def delay_index_call(app_id, app_key, file_name):
 
         file_path = os.path.join(directory, file_name)
 
+        existing_json_data = {}
+        if os.path.exists(file_path):
+            with open(file_path, 'r', encoding='utf-8') as json_file:
+                existing_json_data = json.load(json_file)
+        
+        existing_json_data.update(new_json_data)
+
         # Save the JSON data to the file path
         with open(file_path, 'w', encoding='utf-8') as json_file:
-            json.dump(json_data, json_file, ensure_ascii=False, indent=4)
+            json.dump(existing_json_data, json_file, ensure_ascii=False, indent=4)
 
         print('End API call')
 
