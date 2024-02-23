@@ -18,17 +18,14 @@ To replicate this project, the following technology will be needed:
 - [Apache Airflow](https://airflow.apache.org/) Version 2.8.1
 
 ## Project Datasets
-- airports.csv 
-> found via [Kaggle](https://www.kaggle.com/datasets/tylerx/flights-and-airports-data?select=airports.csv)
-- airline_accidents.json
-- airline_incidents.json
-- airline_operator_risk.json
-> found via [ICAO API Data Service](https://applications.icao.int/dataservices/default.aspx)
-- delay_index.json
-> found via Delay Index API from [CIRIUM FlightStats](https://developer.flightstats.com/api-docs/delayindex/v1#IntDoc)
+- airports.csv - [Kaggle](https://www.kaggle.com/datasets/tylerx/flights-and-airports-data?select=airports.csv)
+- airline_accidents.json, airline_incidents.json, and airline_operator_risk.json - [ICAO API Data Service](https://applications.icao.int/dataservices/default.aspx)
+- delay_index.json - Delay Index API from [CIRIUM FlightStats](https://developer.flightstats.com/api-docs/delayindex/v1#IntDoc)
 
 ## ELT Data Pipeline
 
+
+![elt_diagram.png](images/elt_diagram.png)
 
 ## Database Schema
 
